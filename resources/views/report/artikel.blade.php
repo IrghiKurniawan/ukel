@@ -26,7 +26,7 @@
                     <span><i class="fa fa-eye"></i> {{ $report->views }}</span>
                     <span><i class="fa fa-heart"></i> {{ $report->likes }}</span>
                     <span>{{ $report->user->email }}</span>
-                    <span>{{ $report->created_at->diffForHumans() }}</span>
+                    <span>{{ $report->created_at ? $report->created_at->diffForHumans() : 'Tanggal tidak tersedia' }}</span>
                 </div>
             </div>
         </div>
