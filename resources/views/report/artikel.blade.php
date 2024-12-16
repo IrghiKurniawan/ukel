@@ -28,7 +28,10 @@
                     <span><i class="fa fa-eye"></i> {{ $report->views }}</span>
                     <span><i class="fa fa-heart"></i> {{ $report->likes }}</span>
                     <span>{{ $report->user->email }}</span>
+<<<<<<< HEAD
                     <span>{{ $report->province }}</span>
+=======
+>>>>>>> f65c5246e595ec10e3737ce97b63b4899563c2f5
                     <span>{{ $report->created_at ? $report->created_at->diffForHumans() : 'Tanggal tidak tersedia' }}</span>
                 </div>
             </div>

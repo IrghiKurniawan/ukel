@@ -82,9 +82,16 @@
                                 <select id="type" name="type"
                                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                     required>
+<<<<<<< HEAD
                                     <option value="KEJAHATAN">Kejahatan</option>
                                     <option value="PEMBANGUNAN">Pembangunan</option>
                                     <option value="SOSIAL">Sosial</option>
+=======
+                                    <option value="KEJAHATAN">kejahatan</option>
+                                    <option value="PEMBANGUNAN">pembangunan</option>
+                                    <option value="SOSIAL">sosial</option>
+                                    
+>>>>>>> f65c5246e595ec10e3737ce97b63b4899563c2f5
                                 </select>
                             </div>
 
