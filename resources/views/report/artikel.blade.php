@@ -10,12 +10,14 @@
             </div>
         @endif
 
-        <div class="mb-4">
-            <select class="block w-full p-2 text-sm text-gray-900 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
-                <option selected>Pilih</option>
-            </select>
-            <button class="mt-2 w-full px-4 py-2 text-green bg-green-800 hover:bg-green-900 rounded-lg focus:outline-none focus:ring-4 focus:ring-gray-300">Cari</button>
-        </div>
+        <form action="{{ route('report.artikel') }}" method="GET">
+            <div class="search-bar">
+                <select id="province" name="province"class="form-control">
+                    <option value="" disabled selected >Memuat data...</option>
+                </select>
+                <button type="submit" class="btn btn-dark mt-2 ">Cari</button>
+            </div>
+        </form>
 
         @foreach ($reports as $report)
         <div class="bg-white border rounded-lg shadow-md p-4 flex mb-4">
@@ -26,7 +28,8 @@
                     <span><i class="fa fa-eye"></i> {{ $report->views }}</span>
                     <span><i class="fa fa-heart"></i> {{ $report->likes }}</span>
                     <span>{{ $report->user->email }}</span>
-                    <span>{{ $report->created_at->diffForHumans() }}</span>
+                    <span>{{ $report->province }}</span>
+                    <span>{{ $report->created_at ? $report->created_at->diffForHumans() : 'Tanggal tidak tersedia' }}</span>
                 </div>
             </div>
         </div>
@@ -44,4 +47,26 @@
         </ul>
     </div>
 </div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        const apiEndpoint = "https://www.emsifa.com/api-wilayah-indonesia/api/provinces.json";
+
+        $.getJSON(apiEndpoint, function (data) {
+            const provinceDropdown = $("#province");
+            provinceDropdown.empty();
+            provinceDropdown.append('<option value="" disabled selected>Pilih Provinsi</option>');
+            
+            $.each(data, function (index, province) {
+                provinceDropdown.append(`<option value="${province.id}">${province.name}</option>`); // Backticks digunakan
+            });
+        }).fail(function () {
+            alert("Gagal memuat data provinsi. Silakan coba lagi.");
+            $("#province").empty().append('<option value="" disabled selected>Gagal memuat data</option>');
+        });
+    });
+</script>
+
+
 @endsection

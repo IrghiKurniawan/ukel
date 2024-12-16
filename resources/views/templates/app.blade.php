@@ -78,7 +78,7 @@
         <div class="floating-icons">
             <a href="{{route('landing_page')}}"><i class="fa fa-user"></i></a>
             <a href="{{route('kelola_akun.data')}}"><i class="fa fa-exclamation"></i></a>
-            <a href="#"><i class="fa fa-pencil"></i></a>
+            <a href="{{route('report.artikel')}}"><i class="fa fa-pencil"></i></a>
         </div>
     </footer>
 
