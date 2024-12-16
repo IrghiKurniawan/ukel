@@ -67,9 +67,9 @@
                             </div>
 
                             <div class="mb-3">
-                                <label for="vilage"
+                                <label for="village"
                                     class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Kelurahan*</label>
-                                <select id="vilage" name="vilage"
+                                <select id="village" name="village"
                                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                     disabled required>
                                     <option value="">Pilih</option>
@@ -82,16 +82,9 @@
                                 <select id="type" name="type"
                                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                     required>
-<<<<<<< HEAD
                                     <option value="KEJAHATAN">Kejahatan</option>
                                     <option value="PEMBANGUNAN">Pembangunan</option>
                                     <option value="SOSIAL">Sosial</option>
-=======
-                                    <option value="KEJAHATAN">kejahatan</option>
-                                    <option value="PEMBANGUNAN">pembangunan</option>
-                                    <option value="SOSIAL">sosial</option>
-                                    
->>>>>>> f65c5246e595ec10e3737ce97b63b4899563c2f5
                                 </select>
                             </div>
 
@@ -149,7 +142,7 @@
                 const provinceId = $(this).val();
                 $('#regency').prop('disabled', true).html('<option value="">Pilih Kota/Kabupaten</option>');
                 $('#subdistrict').prop('disabled', true).html('<option value="">Pilih Kecamatan</option>');
-                $('#vilage').prop('disabled', true).html('<option value="">Pilih Kelurahan</option>');
+                $('#village').prop('disabled', true).html('<option value="">Pilih Kelurahan</option>');
 
                 if (provinceId) {
                     $.getJSON('https://www.emsifa.com/api-wilayah-indonesia/api/regencies/' + provinceId +
@@ -168,7 +161,7 @@
             $('#regency').change(function() {
                 const regencyId = $(this).val();
                 $('#subdistrict').prop('disabled', true).html('<option value="">Pilih Kecamatan</option>');
-                $('#vilage').prop('disabled', true).html('<option value="">Pilih Kelurahan</option>');
+                $('#village').prop('disabled', true).html('<option value="">Pilih Kelurahan</option>');
 
                 if (regencyId) {
                     $.getJSON('https://www.emsifa.com/api-wilayah-indonesia/api/districts/' + regencyId +
@@ -186,15 +179,15 @@
             // On change kecamatan
             $('#subdistrict').change(function() {
                 const districtId = $(this).val();
-                $('#vilage').prop('disabled', true).html('<option value="">Pilih Kelurahan</option>');
+                $('#village').prop('disabled', true).html('<option value="">Pilih Kelurahan</option>');
 
                 if (districtId) {
                     $.getJSON('https://www.emsifa.com/api-wilayah-indonesia/api/villages/' + districtId +
                         '.json',
                         function(data) {
-                            $('#vilage').prop('disabled', false);
+                            $('#village').prop('disabled', false);
                             $.each(data, function(key, val) {
-                                $('#vilage').append('<option value="' + val.id + '">' + val
+                                $('#village').append('<option value="' + val.id + '">' + val
                                     .name + '</option>');
                             });
                         });

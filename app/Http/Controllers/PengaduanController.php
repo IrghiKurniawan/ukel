@@ -3,15 +3,32 @@
 namespace App\Http\Controllers;
 
 use App\Models\Pengaduan;
+use App\Models\Comment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 
 class PengaduanController extends Controller
 {
+
+    public function storeComment(Request $request, $id)
+    {
+        $request->validate([
+            'comment' => 'required|string|max:500',
+        ]);
+
+        $report = Pengaduan::findOrFail($id);
+
+        Comment::create([
+            'report_id' => $report->id,
+            'comment' => $request->comment,
+            'user_id' => auth()->id(), // Mengambil ID pengguna yang login
+        ]);
+
+        return redirect()->route('report.show', $id)->with('success', 'Komentar berhasil ditambahkan.');
+    }
     public function index(Request $request)
     {
-<<<<<<< HEAD
         $province = $request->input('province');
 
         // Ambil data laporan berdasarkan provinsi (jika dipilih)
@@ -22,11 +39,6 @@ class PengaduanController extends Controller
             ->get();
 
         return view('report.artikel', compact('reports'));
-=======
-        $reports = Pengaduan::with(['user'])->get();
-        return view('report.artikel', compact('reports'));
-        // dd($reports);
->>>>>>> f65c5246e595ec10e3737ce97b63b4899563c2f5
     }
 
     public function create()
@@ -36,87 +48,57 @@ class PengaduanController extends Controller
 
     public function store(Request $request)
     {
-        // Validasi input dari form
         $request->validate([
             'province' => 'required|string|max:255',
             'regency' => 'required|string|max:255',
             'subdistrict' => 'required|string|max:255',
-<<<<<<< HEAD
             'village' => 'required|string|max:255',
-=======
-            'vilage' => 'required|string|max:255',
->>>>>>> f65c5246e595ec10e3737ce97b63b4899563c2f5
             'type' => 'required|string|in:KEJAHATAN,PEMBANGUNAN,SOSIAL',
             'description' => 'required|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'statement' => 'required|accepted'
         ]);
 
-<<<<<<< HEAD
-        // Ambil nama lokasi dari API
         try {
-            $provinceName = Http::get("https://www.emsifa.com/api-wilayah-indonesia/api/province/{$request->province}.json")
-                ->json()['name'];
-            $regencyName = Http::get("https://www.emsifa.com/api-wilayah-indonesia/api/regency/{$request->regency}.json")
-                ->json()['name'];
-            $subdistrictName = Http::get("https://www.emsifa.com/api-wilayah-indonesia/api/district/{$request->subdistrict}.json")
-                ->json()['name'];
-            $villageName = Http::get("https://www.emsifa.com/api-wilayah-indonesia/api/village/{$request->village}.json")
-                ->json()['name'];
+            $provinceName = Http::get("https://www.emsifa.com/api-wilayah-indonesia/api/province/{$request->province}.json")->json()['name'];
+            $regencyName = Http::get("https://www.emsifa.com/api-wilayah-indonesia/api/regency/{$request->regency}.json")->json()['name'];
+            $subdistrictName = Http::get("https://www.emsifa.com/api-wilayah-indonesia/api/district/{$request->subdistrict}.json")->json()['name'];
+            $villageName = Http::get("https://www.emsifa.com/api-wilayah-indonesia/api/village/{$request->village}.json")->json()['name'];
         } catch (\Exception $e) {
             return back()->withErrors(['error' => 'Gagal mengambil data lokasi. Silakan coba lagi.']);
         }
-=======
-        
-        $provinceName = Http::get("https://www.emsifa.com/api-wilayah-indonesia/api/province/{$request->province}.json")->json()['name'];
-        $regencyName = Http::get("https://www.emsifa.com/api-wilayah-indonesia/api/regency/{$request->regency}.json")->json()['name'];
-        $subdistrictName = Http::get("https://www.emsifa.com/api-wilayah-indonesia/api/district/{$request->subdistrict}.json")->json()['name'];
-        $villageName = Http::get("https://www.emsifa.com/api-wilayah-indonesia/api/village/{$request->vilage}.json")->json()['name'];
->>>>>>> f65c5246e595ec10e3737ce97b63b4899563c2f5
 
-        // Upload file gambar
         $filePath = null;
         if ($request->hasFile('image')) {
             $filePath = $request->file('image')->store('reports', 'public');
         }
 
-        $report = new Pengaduan();
-        $report->user_id = Auth::id();
-        $report->province = $provinceName;
-        $report->regency = $regencyName;
-        $report->subdistrict = $subdistrictName;
-        $report->village = $villageName;
-        $report->type = $request->type;
-        $report->description = $request->description;
-<<<<<<< HEAD
-        $report->image = $filePath;
-=======
-        $report->image = $filePath; 
->>>>>>> f65c5246e595ec10e3737ce97b63b4899563c2f5
-        $report->statement = true;
-        $report->save();
+        Pengaduan::create([
+            'user_id' => Auth::id(),
+            'province' => $provinceName,
+            'regency' => $regencyName,
+            'subdistrict' => $subdistrictName,
+            'village' => $villageName,
+            'type' => $request->type,
+            'description' => $request->description,
+            'image' => $filePath,
+            'statement' => true,
+        ]);
 
-        // // Simpan data ke database
-        // $report = new Pengaduan();
-        // $report->user_id = Auth::id();
-        // $report->province = $request->province;
-        // $report->regency = $request->regency;
-        // $report->subdistrict = $request->subdistrict;
-        // $report->village = $request->vilage; // Perbaikan typo
-        // $report->type = $request->type;
-        // $report->description = $request->description;
-        // $report->image = $filePath; // Simpan path gambar
-        // $report->statement = true;
-        // $report->save();
-
-        // Redirect ke halaman laporan dengan pesan sukses
         return redirect()->route('report.show')->with('success', 'Berhasil membuat pengaduan.');
     }
 
+
     public function show()
+    {
+
+        return view('report.show_report');
+    }
+    public function show_report()
     {
         // Tampilkan laporan milik pengguna yang sedang login
         $reports = Pengaduan::where('user_id', Auth::id())->get();
-        return view('report.show_report', compact('reports'));
+        $reports = Pengaduan::with('comments')->get();
+        return view('report.detail', compact('reports'));
     }
 }

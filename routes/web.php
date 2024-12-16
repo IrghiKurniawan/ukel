@@ -35,6 +35,8 @@ Route::get('/artikel/create', [PengaduanController::class, 'create'])->name('rep
 // Rute untuk menyimpan laporan baru (gunakan POST, bukan GET)
 Route::post('/artikel/store', [PengaduanController::class, 'store'])->name('report.store');
 Route::get('/report/show', [PengaduanController::class, 'show'])->name('report.show');
+Route::post('/reports/{id}/comments', [PengaduanController::class, 'storeComment'])->name('storeComment');
+Route::get('/report/detail', [PengaduanController::class, 'show_report'])->name('report.detail');
 
 
 
