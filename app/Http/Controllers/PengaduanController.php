@@ -32,13 +32,14 @@ class PengaduanController extends Controller
         $province = $request->input('province');
 
         // Ambil data laporan berdasarkan provinsi (jika dipilih)
-        $reports = Pengaduan::with(['user'])
-            ->when($province, function ($query, $province) {
-                return $query->where('province', $province);
-            })
-            ->get();
+        $reports = Pengaduan::with(['users', 'comments'])
+        ->when($province, function ($query, $province) {
+            return $query->where('province', 'LIKE', "%{$province}%");
+        })
+        ->get();
 
         return view('report.artikel', compact('reports'));
+        // dd($reports);
     }
 
     public function create()
@@ -92,7 +93,9 @@ class PengaduanController extends Controller
     public function show()
     {
 
-        return view('report.show_report');
+        // return view('report.show_report');
+        $reports = Pengaduan::with(['users', 'comments'])->get();
+           return view('report.show_report', compact('reports'));
     }
     public function show_report()
     {

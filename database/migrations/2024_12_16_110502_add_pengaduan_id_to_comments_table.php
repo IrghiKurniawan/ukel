@@ -9,14 +9,15 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
+    public function up()
     {
-        Schema::table('comments', function (Blueprint $table) {
-            $table->unsignedBigInteger('pengaduan_id')->after('id');
-            $table->foreign('pengaduan_id')->references('id')->on('pengaduans')->onDelete('cascade');
-            //
-        });
+        if (!Schema::hasColumn('comments', 'pengaduan_id')) {
+            Schema::table('comments', function (Blueprint $table) {
+                $table->bigInteger('pengaduan_id')->nullable(false);
+            });
+        }
     }
+    
 
     /**
      * Reverse the migrations.

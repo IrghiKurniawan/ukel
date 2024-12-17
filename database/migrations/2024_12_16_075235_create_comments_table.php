@@ -13,14 +13,10 @@ return new class extends Migration
     {
         Schema::create('comments', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('pengaduan_id'); // Kolom foreign key ke tabel pengaduan
-            $table->unsignedBigInteger('user_id'); // Kolom foreign key ke tabel users
-            $table->text('comment');
+            $table->foreignId('pengaduan_id')->constrained('pengaduans')->onDelete('cascade'); // Referensi ke tabel pengaduans
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade'); // Referensi ke tabel users
+            $table->string('comment');
             $table->timestamps();
-
-            // Menambahkan constraint foreign key
-            $table->foreign('pengaduan_id')->references('id')->on('pengaduans')->onDelete('cascade');
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 

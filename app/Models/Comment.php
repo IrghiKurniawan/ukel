@@ -16,12 +16,13 @@ class Comment extends Model
         'comment',
     ];
 
-    public function comments()
+    public function user()
     {
-        return $this->hasMany(Comment::class);
+        return $this->belongsTo(User::class, 'user_id');
+    }    
+
+    public function pengaduan()
+    {
+        return $this->belongsTo(Pengaduan::class, 'pengaduan_id');
     }
-    // public function report()
-    // {
-    //     return $this->belongsTo(Report::class);
-    // }
 }

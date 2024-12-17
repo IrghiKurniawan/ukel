@@ -40,7 +40,7 @@
                         <div class="flex items-center space-x-3 text-sm text-gray-500 mt-2">
                             <span><i class="fa fa-eye mr-1"></i>{{ $report->viewers }}</span>
                             <span><i class="fa fa-heart mr-1"></i>0 Likes</span>
-                            <span>{{ $report->created_at->diffForHumans() }}</span>
+                            <span>{{ $report->created_at ? $report->created_at->diffForHumans() : 'Tanggal tidak tersedia' }}</span>
                         </div>
                         <a href="{{ route('report.detail', $report->id) }}"
                             class="inline-block mt-3 text-blue-500 hover:underline font-medium">
@@ -77,7 +77,7 @@
                 provinceDropdown.empty();
                 provinceDropdown.append('<option value="" disabled selected>Pilih Provinsi</option>');
                 $.each(data, function (index, province) {
-                    provinceDropdown.append(`<option value="${province.id}">${province.name}</option>`);
+                    provinceDropdown.append(`<option value="${province.name}">${province.name}</option>`);
                 });
             }).fail(function () {
                 alert("Gagal memuat data provinsi. Silakan coba lagi.");
@@ -85,4 +85,5 @@
             });
         });
     </script>
+    
     @endsection

@@ -48,13 +48,12 @@ class Pengaduan extends Model
     /**
      * Get the user that owns the report.
      */
-    public function user()
+    public function users()
     {
-        return $this->belongsTo(User::class,);
+        return $this->belongsTo(User::class, 'user_id');
     }
-    
     public function comments()
     {
-        return $this->hasMany(Comment::class);
+        return $this->hasMany(Comment::class, 'pengaduan_id');
     }
 }

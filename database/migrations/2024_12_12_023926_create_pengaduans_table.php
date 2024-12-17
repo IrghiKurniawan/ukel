@@ -13,17 +13,17 @@ return new class extends Migration
     {
         Schema::create('pengaduans', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id' );
+            $table->foreignId('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->text('description');
             $table->enum('type', ['KEJAHATAN', 'PEMBANGUNAN', 'SOSIAL']);
-            $table->string('province', 255);
-            $table->string('regency', 255);
-            $table->string('subdistrict', 255);
-            $table->string('village', 255);
-            $table->json('voting')->nullable();
+            $table->string('province');
+            $table->string('regency');
+            $table->string('subdistrict');
+            $table->string('village');
+            $table->json('voting')->default(json_encode([])); 
             $table->integer('viewers')->default(0);
-            $table->string('image', 255 )->nullable();
-            $table->boolean('statement');   
+            $table->string('image');
+            $table->boolean('statement');
             $table->timestamps();
         });
     }
