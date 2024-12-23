@@ -2,146 +2,161 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;  // Menggunakan model User untuk akun
-use Illuminate\Http\RedirectResponse;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
+    /**
+     * Tampilkan halaman landing.
+     */
     public function tampilLanding()
     {
-        return view('landing_page');
+        return view('landing-page');
     }
 
-
-    public function tampil()
+    /**
+     * Menampilkan daftar pengguna.
+     */
+    public function index()
     {
-        return view('login');
+        $users = User::simplePaginate(5);
+        return view('users.index', compact('users'));
     }
-    public function loginProses(Request $request){
+
+    /**
+     * Tampilkan halaman login.
+     */
+    public function login()
+    {
+        return view('login_page');
+    }
+
+    /**
+     * Mengautentikasi pengguna dan mengarahkan berdasarkan peran.
+     */
+    public function loginAuth(Request $request)
+    {
         $request->validate([
             'email' => 'required|email',
-            'password' => 'required'
+            'password' => 'required',
         ]);
-        // ambil data dr input satukan pada array
+
+        // Validasi kredensial dan autentikasi
         $user = $request->only('email', 'password');
-        // cek kecocokan email dan password, lalu simpan pada class auth
+
         if (Auth::attempt($user)) {
-            // attempt 1. Mengecek kecocokan email dan password
-            // attempt 2. Memastikan enkripsi
-            // attempt 3. Memasukan kedalam history
-            // jika berhasil, redirect ke landing page
-            return redirect()->route('report.artikel');
+            $authenticatedUser = Auth::user();
+            switch ($authenticatedUser->role) {
+                case 'GUEST':
+                    return redirect()->route('report.index');
+                case 'HEAD_STAFF':
+                    return redirect()->route('home.akun');
+                case 'STAFF':
+                    return redirect()->route('response');
+                default:
+                    Auth::logout();
+                    return redirect()->route('login')->with('failed', 'Role tidak valid.');
+            }
         } else {
-            return redirect()->back()->with('failed', 'tetiasa login coba dei');
+            return redirect()->back()->with('failed', 'Email atau password salah.');
         }
     }
 
-    public function logout(){
-        Auth::logout();
-        return redirect()->route('login')->with('logout', 'loGoUt bErHAsiL');
-    }
-
     /**
-     * Tampilkan daftar akun dengan opsi pencarian.
+     * Tampilkan halaman registrasi.
      */
-    public function index(Request $request)
+    public function register()
     {
-        $search = $request->input('cari');
-
-        // Filter data akun berdasarkan pencarian
-        $users = User::when($search, function ($query, $search) {
-            return $query->where('name', 'like', '%' . $search . '%');
-        })->paginate(10); // Paginate
-
-        return view('user.kel_akun', compact('users'));
+        return view('register');
     }
 
     /**
-     * Tampilkan form untuk menambahkan akun.
+     * Membuat akun baru dan mengarahkan pengguna setelah pendaftaran.
+     */
+    public function createUser(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+        ]);
+
+        $user = User::create([
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'role' => 'GUEST',
+        ]);
+
+        Auth::login($user);
+        return redirect()->route('report.index')->with('success', 'Akun berhasil dibuat.');
+    }
+
+    /**
+     * Logout pengguna dan mengarahkan ke halaman login.
+     */
+    public function logout()
+    {
+        Auth::logout();
+        return redirect()->route('login')->with('success', 'Anda telah berhasil logout.');
+    }
+
+    /**
+     * Tampilkan form pembuatan pengguna.
      */
     public function create()
     {
-        return view('user.create_akun'); // Sesuaikan dengan view tambah akun
+        return view('users.create');
     }
 
     /**
-     * Simpan data akun yang baru ditambahkan.
+     * Simpan pengguna baru ke dalam penyimpanan.
      */
     public function store(Request $request)
     {
-        // Validasi data yang dimasukkan
         $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255|unique:users',
-            'role' => 'required|in:STAFF,HEAD_STAFF', // Pastikan role sesuai
-            'password' => 'required|min:6', // Validasi password
+            'email' => 'required|email',
+            'password' => 'required',
+            'role' => 'required',
         ]);
 
-        // Hash password dengan yang diinputkan pengguna
-        $password = substr($request->name, 0, 3) . substr($request->email, 0, 3);
         User::create([
-            'name' => $request->name,
             'email' => $request->email,
+            'password' => Hash::make($request->password),
             'role' => $request->role,
-            'password' => Hash::make($password), // Hash password
         ]);
 
-        return redirect()->route('kelola_akun.data')->with('success', 'Akun berhasil ditambahkan.');
+        return redirect()->route('home.akun')->with('success', 'User created successfully');
     }
 
     /**
-     * Tampilkan form untuk mengubah data akun.
+     * Reset password pengguna berdasarkan ID.
      */
-    public function edit($id)
+    public function reset($id)
     {
-        $user = User::findOrFail($id); // Cari akun berdasarkan ID
-        return view('user.edit_akun', compact('user')); // Sesuaikan dengan view edit akun
-    }
+        $user = User::find($id);
 
-    /**
-     * Simpan perubahan data akun.
-     */
-    public function update(Request $request, $id)
-    {
-        // Validasi data yang diperbarui
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255|unique:users,email,' . $id,
-            'role' => 'required|in:STAFF,HEAD_STAFF', // Pastikan role sesuai
-            'password' => 'nullable|min:6', // Password opsional, jika ingin diubah
-        ]);
-
-        // Cari akun berdasarkan ID dan perbarui
-        $user = User::findOrFail($id);
-        $user->name = $request->input('name');
-        $user->email = $request->input('email');
-        $user->role = $request->input('role');
-
-        if ($request->filled('password')) {
-            $user->password = Hash::make($request->input('password')); // Hash password jika diisi
+        if (!$user) {
+            return redirect()->route('home.akun')->with('failed', 'User tidak ditemukan.');
         }
 
-        $user->save();
+        $email = $user->email;
+        $password = explode('@', $email)[0];
 
-        return redirect()->route('kelola_akun.data')->with('success', 'Data akun berhasil diperbarui.');
+        $user->update([
+            'password' => Hash::make($password),
+        ]);
+
+        return redirect()->route('home.akun')->with('success', 'Password reset successfully');
     }
 
     /**
-     * Hapus akun.
-     * Hapus akun berdasarkan ID yang diberikan.
-     *
-     * @param int $id ID akun yang akan dihapus.
-     * @return \Illuminate\Http\RedirectResponse Redirect ke halaman daftar akun dengan pesan sukses.
-     * @throws \Exception Jika akun tidak ditemukan.
+     * Hapus pengguna berdasarkan ID.
      */
-    public function destroy($id)
+    public function destroy(string $id)
     {
-        $user = User::findOrFail($id);
-        $user->delete();
-
-        return redirect()->route('kelola_akun.data')->with('success', 'Akun berhasil dihapus.');
+        User::find($id)->delete();
+        return redirect()->route('home.akun')->with('success', 'User deleted successfully');
     }
 }
